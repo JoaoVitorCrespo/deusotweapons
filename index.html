@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeusOT - Exercise Weapons</title>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --card-bg: #202024;
+            --text-color: #e1e1e6;
+            --primary-color: #e58e26; /* Laranja OT (Magic Level) */
+            --secondary-color: #04d361; /* Verde (Skill) */
+            --input-bg: #121214;
+            --border-color: #323238;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        /* Ajuste do Título no modo Skill */
+        body.skill-mode h1 {
+            color: var(--secondary-color);
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #777;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* --- TABS --- */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 0.8rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: #a8a8b3;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: #121214;
+            border-color: var(--primary-color);
+        }
+        
+        .tab-btn[data-type="skill"].active {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: #121214;
+        }
+
+        /* --- FORMS --- */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #a8a8b3;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box; 
+        }
+
+        select:focus, input:focus {
+            outline: 2px solid var(--primary-color);
+            border-color: transparent;
+        }
+        
+        body.skill-mode select:focus, body.skill-mode input:focus {
+            outline-color: var(--secondary-color);
+        }
+        
+        /* --- Input do Bonus do Dummy (Correção aqui) --- */
+        .bonus-input {
+            border-color: var(--primary-color) !important;
+            /* Pequeno efeito visual para destacar */
+            box-shadow: 0 0 5px rgba(229, 142, 38, 0.1); 
+        }
+        
+        body.skill-mode .bonus-input {
+            border-color: var(--secondary-color) !important;
+            box-shadow: 0 0 5px rgba(4, 211, 97, 0.1);
+        }
+
+        /* --- BOTÃO DE AÇÃO --- */
+        .action-btn {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1rem;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 4px;
+            color: #121214;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+
+        .action-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        body.skill-mode .action-btn {
+            background-color: var(--secondary-color);
+        }
+
+        /* --- RESULTADOS --- */
+        .result-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: var(--input-bg);
+            border-radius: 4px;
+            border-left: 4px solid var(--primary-color);
+            display: none;
+        }
+        
+        body.skill-mode .result-box {
+            border-left-color: var(--secondary-color);
+        }
+
+        .result-item {
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #323238;
+            padding-bottom: 0.5rem;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .result-item span:first-child {
+            color: #a8a8b3;
+            font-size: 0.9rem;
+        }
+
+        .result-item span:last-child {
+            font-weight: bold;
+            color: #fff;
+            text-align: right;
+        }
+
+        .highlight {
+            color: var(--primary-color) !important;
+            font-size: 1.1rem;
+        }
+        
+        body.skill-mode .highlight {
+            color: var(--secondary-color) !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculadora de Exercise Weapons</h1>
+    <div class="subtitle">Customizado para o DeusOT</div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="setMode('ml')" data-type="ml">Magic Level</button>
+        <button class="tab-btn" onclick="setMode('skill')" data-type="skill">Skills (Melee/Dist)</button>
+    </div>
+
+    <div class="form-group">
+        <label for="vocation">Vocação / Tipo</label>
+        <select id="vocation">
+            </select>
+    </div>
+
+    <div class="form-group">
+        <label for="currentLvl">Nível Atual</label>
+        <input type="number" id="currentLvl" placeholder="Ex: 80" min="10">
+    </div>
+
+    <div class="form-group">
+        <label for="percentLeft">% Restante</label>
+        <input type="number" id="percentLeft" placeholder="Ex: 45,78" min="0" max="100">
+    </div>
+
+    <div class="form-group">
+        <label for="targetLvl">Nível Desejado</label>
+        <input type="number" id="targetLvl" placeholder="Ex: 100" min="11">
+    </div>
+
+    <div class="form-group">
+        <label for="dummyBonus" style="color: #999">Bônus do Dummy (%).</label>
+        <input type="number" id="dummyBonus" class="bonus-input" placeholder=" Ex.: DeusOT Super Dummy = 25" min="0">
+    </div>
+
+    <button class="action-btn" onclick="calculate()">Calcular Varinhas</button>
+
+    <div id="result-box" class="result-box">
+        <div class="result-item">
+            <span id="label-recurso">Recurso Total:</span>
+            <span id="val-recurso">0</span>
+        </div>
+        
+        <div class="result-item">
+            <span>Varinhas (14.400 Cargas):</span>
+            <span id="res-14400" class="highlight">0</span>
+        </div>
+        <div class="result-item">
+            <span>Varinhas (5.400 Cargas):</span>
+            <span id="res-5400" class="highlight">0</span>
+        </div>
+        
+        <div id="ml-extras" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #444; display:none">
+            <div class="result-item">
+                <span>Ou em Ultimate Mana Potions:</span>
+                <span id="res-ump">0</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentMode = 'ml'; 
+
+    const stages = {
+        standard: [
+            { maxLvl: 80, rate: 15 },
+            { maxLvl: 100, rate: 7 },
+            { maxLvl: 120, rate: 4 },
+            { maxLvl: 130, rate: 3 },
+            { maxLvl: 9999, rate: 2 }
+        ],
+        rp_ml: [
+            { maxLvl: 20, rate: 8 },
+            { maxLvl: 25, rate: 3 },
+            { maxLvl: 34, rate: 2 },
+            { maxLvl: 9999, rate: 1.5 }
+        ]
+    };
+
+    const configs = {
+        ml: [
+            { name: "Mage", value: "mage_ml" },
+            { name: "Paladin", value: "rp_ml" }
+        ],
+        skill: [
+            { name: "Melee", value: "melee" },
+            { name: "Distance", value: "dist" },
+            { name: "Magic Level (Bloqueado)", value: "blocked", disabled: true }
+        ]
+    };
+
+    function setMode(mode) {
+        currentMode = mode;
+        const body = document.body;
+        const vocSelect = document.getElementById('vocation');
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.tab-btn[data-type="${mode}"]`).classList.add('active');
+
+        document.getElementById('result-box').style.display = 'none';
+
+        if(mode === 'skill') body.classList.add('skill-mode');
+        else body.classList.remove('skill-mode');
+
+        vocSelect.innerHTML = '';
+        configs[mode].forEach(opt => {
+            if(opt.value === 'blocked') return;
+            const option = document.createElement('option');
+            option.value = opt.value;
+            option.innerText = opt.name;
+            vocSelect.appendChild(option);
+        });
+    }
+
+    setMode('ml');
+
+    function getStageRate(level, type) {
+        let table = stages.standard;
+        if (type === 'rp_ml') table = stages.rp_ml;
+
+        for (let stage of table) {
+            if (level <= stage.maxLvl) return stage.rate;
+        }
+        return 1;
+    }
+
+    function getGlobalBaseCostNextLevel(lvl, type) {
+        if (type === 'mage_ml' || type === 'rp_ml') {
+            let multiplier = (type === 'mage_ml') ? 1.1 : 1.4;
+            const A = 1600;
+            const totalNext = (A * (Math.pow(multiplier, lvl + 1) - 1)) / (multiplier - 1);
+            const totalCurr = (A * (Math.pow(multiplier, lvl) - 1)) / (multiplier - 1);
+            return totalNext - totalCurr;
+        } else {
+            let A = (type === 'dist') ? 30 : 50;
+            let b = 1.1;
+            return A * Math.pow(b, lvl - 10);
+        }
+    }
+
+    function formatWandOutput(totalCharges, capacity) {
+        let units = totalCharges / capacity;
+        if (units < 1) {
+            return Math.ceil(totalCharges).toLocaleString('pt-BR') + " cargas";
+        } else {
+            return units.toFixed(2) + " unid.";
+        }
+    }
+
+    function calculate() {
+        const current = parseInt(document.getElementById('currentLvl').value);
+        const target = parseInt(document.getElementById('targetLvl').value);
+        const percentLeft = parseFloat(document.getElementById('percentLeft').value) || 0;
+        const vocValue = document.getElementById('vocation').value;
+        const dummyBonus = parseFloat(document.getElementById('dummyBonus').value) || 0;
+
+        if (!current || !target || target <= current) {
+            alert("Nível alvo deve ser maior que o atual.");
+            return;
+        }
+
+        let totalRealCost = 0;
+
+        for (let lvl = current; lvl < target; lvl++) {
+            let baseCost = getGlobalBaseCostNextLevel(lvl, vocValue);
+            let serverRate = getStageRate(lvl, vocValue);
+            let effectiveRate = serverRate * (1 + (dummyBonus / 100));
+            
+            let costForThisLevel = baseCost / effectiveRate;
+
+            if (lvl === current) {
+                costForThisLevel = costForThisLevel * (percentLeft / 100);
+            }
+
+            totalRealCost += costForThisLevel;
+        }
+        
+        totalRealCost = Math.ceil(totalRealCost);
+
+        const resultBox = document.getElementById('result-box');
+        const mlExtras = document.getElementById('ml-extras');
+        
+        let totalChargesNeeded = 0;
+
+        if (currentMode === 'ml') {
+            document.getElementById('label-recurso').innerText = "Mana Real Necessária:";
+            document.getElementById('val-recurso').innerText = totalRealCost.toLocaleString('pt-BR');
+            
+            // Mana -> Cargas (1 Carga = 600 Mana)
+            totalChargesNeeded = Math.ceil(totalRealCost / 600);
+            
+            document.getElementById('res-ump').innerText = Math.ceil(totalRealCost / 500).toLocaleString('pt-BR');
+            mlExtras.style.display = 'block';
+
+        } else {
+            document.getElementById('label-recurso').innerText = "Hits Necessários:";
+            document.getElementById('val-recurso').innerText = totalRealCost.toLocaleString('pt-BR');
+            
+            totalChargesNeeded = totalRealCost;
+            mlExtras.style.display = 'none';
+        }
+
+        document.getElementById('res-14400').innerText = formatWandOutput(totalChargesNeeded, 14400);
+        document.getElementById('res-5400').innerText = formatWandOutput(totalChargesNeeded, 5400);
+        
+        resultBox.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
